@@ -1,0 +1,148 @@
+#include <iostream>
+#include <fstream>
+#include <list>
+#include <vector>
+#include <ctime>
+#include <cstdlib>
+#include "Node.h"
+
+
+const int SIZE_RANDOM_MATRIX = 6;
+
+int main(int argc, char **argv)
+{
+/************************************
+    GRAPH CREATION
+**************************************/
+    int **graph;
+    int SIZE_MATRIX=0;
+    if(argc > 1){
+        ifstream file(argv[1]);
+        if(!file){
+            cout << "File Not Found" << endl;
+            return -1;
+        }
+        file >> SIZE_MATRIX;
+
+        graph = new int*[SIZE_MATRIX];
+
+        for(int i = 0; i< SIZE_MATRIX; i++){
+            graph[i] = new int[SIZE_MATRIX];
+        }
+
+        for(int i = 0; i< SIZE_MATRIX; i++){
+            for(int j = 0; j < SIZE_MATRIX; j++){
+                file >> graph[i][j];
+                cout << graph[i][j] << " ";
+            }
+            cout << endl;
+        }
+    } else {
+        SIZE_MATRIX = SIZE_RANDOM_MATRIX;
+        srand(time(0));
+
+        graph = new int*[SIZE_MATRIX];
+        for(int i = 0; i< SIZE_MATRIX; i++){
+            graph[i] = new int[SIZE_MATRIX];
+        }
+
+        for(int i = 0; i< SIZE_MATRIX; i++){
+            for(int j = 0; j <SIZE_MATRIX; j++){
+                if (i == j) graph[i][j] = 0;
+                else graph[i][j] = (rand()%10);
+                cout << graph[i][j] << " ";
+            }
+            cout << endl;
+        }
+    }
+/*****************************************
+	USER INTERACTION
+*******************************************/
+	while(1){
+		int startNode=-1,endNode=-1;
+		while(startNode < 0 || startNode >= SIZE_MATRIX){
+			cout << "Insert Starting Node: ";
+			cin >> startNode;
+		}
+		while(endNode < 0 || endNode >= SIZE_MATRIX){
+			cout << endl << "Insert Ending Node: ";
+			cin >> endNode;
+		}
+
+		cout << "Calculating the shortest path between " << startNode << " and " << endNode << "..."<< endl; 
+	/************************************************
+		INITIALIZATION
+		the closed set has only the starting node at cost 0
+		the open set has the links between the starting node and all the other nodes
+	**********************************************/
+		vector<Node> closedSet(SIZE_MATRIX,-1);
+		{
+			int i=0;
+			for(vector<Node>::iterator it = closedSet.begin(); it != closedSet.end();it++){
+				it->setID((i==startNode)? i : -1 );
+				it->setCost((i==startNode)? 0 : -1 );
+				i++;
+			}
+		}
+
+		vector<Node> openSet(SIZE_MATRIX,-1);
+		{
+			int i=0;
+			for(vector<Node>::iterator it = openSet.begin(); it !=openSet.end();it++){
+				it->setID((i!=startNode)? i : -1);
+				it->setFather(startNode);
+				if(graph[startNode][i]){
+					it->setCost(graph[startNode][i]);
+				} else {
+					it->setCost(-1);
+				}
+				i++;
+			}
+		}
+	/*********************************************
+		ALGORITHM
+	**********************************************/
+		int currentIndex = startNode;
+		int countNodes=1;						//i need the count because otherwise i don't know if i have finished the nodes in the open set(it has static size so i cannot check openSet.empty())
+		while(countNodes < SIZE_MATRIX-1 && currentIndex != endNode){
+			for(int i=0;i<SIZE_MATRIX && currentIndex != endNode;i++){
+				int min=10000;					//just a placeholder.....i need infinite here, but i'm assuming that i'll not have numbers more than 10000
+				for(int j=0;j<SIZE_MATRIX;j++){
+					if(closedSet[j].getID() == -1){						//must be on the open set
+						if(openSet[j].getCost() != -1 && openSet[j].getCost() < min){
+							min=openSet[j].getCost();
+							currentIndex = j;
+						}
+					}
+				}
+				if(closedSet[currentIndex].getFather() != openSet[currentIndex].getFather()){	//if something changed since last iteration, let's update the closed set
+					closedSet[currentIndex] = openSet[currentIndex];
+					openSet[currentIndex].setID(-1);
+					countNodes++;
+				}
+				//let's update the cost of every node on the openSet with the minimum
+				for(int j=0;j<SIZE_MATRIX;j++){
+					if(closedSet[j].getID() == -1){
+						if(graph[currentIndex][j] != 0 && ((min + graph[currentIndex][j] < openSet[j].getCost())||(openSet[j].getCost() == -1))){
+							openSet[j].setCost(min + graph[currentIndex][j]);
+							openSet[j].setFather(currentIndex);
+						}
+					}
+				}
+			}
+
+		}
+		//for(int j = 0; j<SIZE_MATRIX;j++)
+		//	cout << openSet[j] << "	" << closedSet[j] << endl;
+
+		cout << "The path costs " << closedSet[endNode].getCost() << " and is: " <<endl;
+		int j=endNode;
+		while(j!= startNode){
+			cout << j << " <- ";
+			j=closedSet[j].getFather();
+		}
+		cout << j << endl;		//startNode
+		//system("pause");		//windows systems
+	}
+	return 0;
+}
