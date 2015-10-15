@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>Debug_a.out</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>a.out</name>
+			<type>1</type>
+			<location>/home/fabrizio/gitProjects/CPP_demo/LQueue/a.out</location>
+		</link>
+	</linkedResources>
+</projectDescription>

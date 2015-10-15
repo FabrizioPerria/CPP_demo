@@ -14,12 +14,12 @@ static const size_t COPY_CAR = 2;
 static const size_t COPY_BIKE = 3;
 
 // declare the classes before we define them, so we can refer
-// to the class name without any problems.
+// to the class name without any problems. 
 
-template <class T>
+template <class T> 
 class BadAssignment;
 
-template <class T>
+template <class T> 
 class BadAssignment
 {
 public:
@@ -58,7 +58,7 @@ public:
 
 template <class T> size_t BadAssignment<T>::count = 0;
 
-void
+void 
 testConstructors (LQUEUE **queues)
 {
   std::cerr << "--Testing constructors (4 total) and enqueues (7 total).--\n\n";
@@ -74,7 +74,7 @@ testConstructors (LQUEUE **queues)
   queues[CAR]->enqueue ('c');
   queues[CAR]->enqueue ('a');
   queues[CAR]->enqueue ('r');
-
+  
   std::cerr << "done.\n";
 
   std::cerr << "Third test. Enqueue 'bike': ";
@@ -97,7 +97,7 @@ testConstructors (LQUEUE **queues)
   std::cerr << "\n\n--Constructor/enqueue tests have finished--\n";
 }
 
-void
+void 
 testDequeue (LQUEUE **queues)
 {
   std::cerr << "\n--Testing dequeue--\n";
@@ -161,12 +161,12 @@ testDequeue (LQUEUE **queues)
 
   std::cerr << "\n--Dequeue tests have finished--\n";
   std::cerr << "\nPress any key to continue.\n\n";
-
+  
   getchar ();
 
 }
 
-void
+void 
 testIterators (LQUEUE **queues)
 {
   std::cerr << "\n--Testing iterators--\n";
@@ -182,7 +182,7 @@ testIterators (LQUEUE **queues)
   for (LQUEUE::iterator i (car->begin ()); i != car->end (); ++i)
     std::cerr << *i;
 
-  std::cerr << "\nThe following should print out 'bike': ";
+  std::cerr << "\nThe following should print out 'bike': "; 
   for (LQUEUE::iterator i (bike->begin ()); i != bike->end (); ++i)
     std::cerr << *i;
 
@@ -190,7 +190,7 @@ testIterators (LQUEUE **queues)
   for (LQUEUE::iterator i (cars->begin ()); i != cars->end (); ++i)
     std::cerr << *i;
 
-  std::cerr << "\nThe following should print out 'bikes': ";
+  std::cerr << "\nThe following should print out 'bikes': "; 
   for (LQUEUE::iterator i (bikes->begin ()); i != bikes->end (); ++i)
     std::cerr << *i;
 
@@ -198,7 +198,7 @@ testIterators (LQUEUE **queues)
   for (LQUEUE::reverse_iterator i (car->rbegin ()); i != car->rend (); ++i)
     std::cerr << *i;
 
-  std::cerr << "\nThe following should print out 'ekib': ";
+  std::cerr << "\nThe following should print out 'ekib': "; 
   for (LQUEUE::reverse_iterator i (bike->rbegin ()); i != bike->rend (); ++i)
     std::cerr << *i;
 
@@ -206,7 +206,7 @@ testIterators (LQUEUE **queues)
   for (LQUEUE::reverse_iterator i (cars->rbegin ()); i != cars->rend (); ++i)
     std::cerr << *i;
 
-  std::cerr << "\nThe following should print out 'sekib': ";
+  std::cerr << "\nThe following should print out 'sekib': "; 
   for (LQUEUE::reverse_iterator i (bikes->rbegin ()); i != bikes->rend (); ++i)
     std::cerr << *i;
 
@@ -246,7 +246,7 @@ testIterators (LQUEUE **queues)
 
   std::cerr << "\n\n--Iterator tests have finished--\n";
   std::cerr << "\nPress any key to continue.\n\n";
-
+  
   getchar ();
 }
 
@@ -285,7 +285,6 @@ main (int argc, char *argv[])
       LQUEUE::value_type name[MAX_NAME_LEN];
 
       LQUEUE q1 (MAX_NAME_LEN);
-
       try
         {
           LQUEUE::value_type c = q1.front ();
@@ -294,7 +293,7 @@ main (int argc, char *argv[])
         }
       catch (LQUEUE::Underflow &)
         {
-          std::cerr << "1. dequeueing from empty queue" << std::endl;
+          std::cerr << "dequeueing from empty queue" << std::endl;
         }
 
       for (LQUEUE::iterator iterator (q1.begin ());
@@ -307,7 +306,7 @@ main (int argc, char *argv[])
       std::cerr << "Please enter your name..: ";
       std::cin.getline (name, MAX_NAME_LEN);
       size_t readin = std::cin.gcount () - 1;
-
+	
       for (size_t i = 0; i < readin && !q1.is_full (); i++)
         q1.enqueue (name[i]);
 
@@ -323,7 +322,7 @@ main (int argc, char *argv[])
       assert (q1.size () == size);
 
       std::cerr << std::endl << "your name is..: ";
-
+  
       for (LQUEUE::iterator iterator (q1.begin ());
            iterator != q1.end ();
            iterator++)
@@ -352,7 +351,7 @@ main (int argc, char *argv[])
         }
       catch (LQUEUE::Underflow &)
         {
-          std::cerr << std::endl << "2. dequeueing from empty queue" << std::endl;
+          std::cerr << std::endl << "dequeueing from empty queue" << std::endl;
         }
 
       std::cerr << std::endl;
@@ -433,7 +432,7 @@ main (int argc, char *argv[])
 
       BadAssignment<char> temp;
       LQueue< BadAssignment<char> > ba(8);
-
+    
       temp.data = 'c';
       ba.enqueue(temp);
 
@@ -489,6 +488,6 @@ main (int argc, char *argv[])
 
   LQueue_Node<char>::free_list_release();
   LQueue_Node<BadAssignment<char> >::free_list_release();
-
-  return 0;
+  system("pause");
+  return 0;	
 }

@@ -106,7 +106,7 @@ public:
   // Assignment operator.
   LQueue<T, LQUEUE_NODE> &operator = (const LQueue<T, LQUEUE_NODE> &rhs);
 
-  // Perform actions needed when queue goes out of scope.
+  // Perform actions needed when queue goes out of scope. 
   ~LQueue (void);
 
   // = Classic Queue operations.
@@ -120,16 +120,16 @@ public:
   // exception if the queue is empty.
   void dequeue (void);
 
-  // Returns the front queue item without removing it.
-  // Throws the <Underflow> exception if the queue is empty.
+  // Returns the front queue item without removing it. 
+  // Throws the <Underflow> exception if the queue is empty. 
   T front (void) const;
 
-  // = Check boundary conditions for Queue operations.
+  // = Check boundary conditions for Queue operations. 
 
-  // Returns 1 if the queue is empty, otherwise returns 0.
+  // Returns 1 if the queue is empty, otherwise returns 0. 
   bool is_empty (void) const;
 
-  // Returns 1 if the queue is full, otherwise returns 0.
+  // Returns 1 if the queue is full, otherwise returns 0. 
   bool is_full (void) const;
 
   // Returns the current number of elements in the queue.
@@ -206,7 +206,7 @@ private:
  * you cannot change the underlying queue!
  */
 template <typename T, typename LQUEUE_NODE>
-class LQueue_Iterator
+class LQueue_Iterator 
 {
 public:
   friend class LQueue<T, LQUEUE_NODE>;
@@ -244,7 +244,7 @@ public:
   typedef int difference_type;
 
 protected:
-  /// Construct an LQueue_Iterator at node pos.
+  /// Construct an LQueue_Iterator at node pos.  
   LQueue_Iterator (LQUEUE_NODE *pos);
 
 private:
@@ -261,7 +261,7 @@ private:
  * you cannot change the underlying queue!
  */
 template <typename T, typename LQUEUE_NODE>
-class Const_LQueue_Iterator
+class Const_LQueue_Iterator 
 {
 public:
   friend class LQueue<T, LQUEUE_NODE>;
@@ -296,7 +296,7 @@ public:
   typedef int difference_type;
 
 protected:
-  /// Construct a Const_LQueue_Iterator at node pos.
+  /// Construct a Const_LQueue_Iterator at node pos.  
   Const_LQueue_Iterator (LQUEUE_NODE *pos);
 
 private:
@@ -313,7 +313,7 @@ private:
  * you cannot change the underlying queue!
  */
 template <typename T, typename LQUEUE_NODE>
-class LQueue_Reverse_Iterator
+class LQueue_Reverse_Iterator 
 {
 public:
   friend class LQueue<T, LQUEUE_NODE>;
@@ -355,7 +355,7 @@ public:
   typedef int difference_type;
 
 protected:
-  /// Construct an LQueue_Iterator at position pos.
+  /// Construct an LQueue_Iterator at position pos.  
   LQueue_Reverse_Iterator (LQUEUE_NODE *pos);
 
 private:
@@ -372,7 +372,7 @@ private:
  * you cannot change the underlying queue!
  */
 template <typename T, typename LQUEUE_NODE>
-class Const_LQueue_Reverse_Iterator
+class Const_LQueue_Reverse_Iterator 
 {
 public:
   friend class LQueue<T, LQUEUE_NODE>;
@@ -411,7 +411,7 @@ public:
   typedef int difference_type;
 
 protected:
-  /// Construct an LQueue_Reverse_Iterator at position pos.
+  /// Construct an LQueue_Reverse_Iterator at position pos.  
   Const_LQueue_Reverse_Iterator (LQUEUE_NODE *pos);
 
 private:
