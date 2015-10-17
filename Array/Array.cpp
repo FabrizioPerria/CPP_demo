@@ -1,17 +1,17 @@
 /***************************************
  Class: CS251
- Assignment Number: 1
+ Assignment Number: 2
  Honor Pledge: I pledge that I have not recieved nor given help on this assignment.
  ***************************************/
 
-#ifndef ARRAY_C
-#define ARRAY_C
+#ifndef ARRAY_CPP
+#define ARRAY_CPP
 
-#include <stdexcept>    //std::out_of_range
-#include <new>          //std::bad_alloc
-#include <array>        //std::out_of_range
-#include <algorithm>    //std::fill, std::copy
+#include <sys/types.h>
 
+#include <algorithm>
+#include <sstream>
+#include <new>
 #include "Array.h"
 
 #if !defined (__INLINE__)
@@ -19,132 +19,136 @@
 #include "Array.inl"
 #endif /* __INLINE__ */
 
-Array::Array (size_t size)
+template <typename T>
+Array<T>::Array (size_t size) : max_size_(size),cur_size_(size),default_value_(nullptr), array_(new T[size])
 {
-    try {
-        this->array_ = new T[size]();
-    } catch (std::bad_alloc) {
-        throw std::bad_alloc();
-    }
-    this->max_size_ = size;
-    this->cur_size_ = size;
 }
 
-// Dynamically initialize an array.
-
-Array::Array (size_t size, const T &default_value)
+template <typename T>
+Array<T>::Array (size_t size, const T &default_value) : array_(0),max_size_(size),cur_size_(size),
+default_value_(new T(*default_value))
 {
-    try {
-        this->array_ = new T[size]();
-    } catch (std::bad_alloc) {
-        throw std::bad_alloc();
-    }
-    std::fill(this->array_, this->array_ + size, default_value);
-    this->max_size_ = size;
-    this->cur_size_ = size;
+    scoped_array<T> tmp (new T[size]);
+    std::fill(tmp.get(),tmp.get() + size,*default_value);
+    tmp.swap(array_);
 }
 
 // The copy constructor (performs initialization).
 
-Array::Array (const Array &s)
+template <typename T>
+Array<T>::Array (const Array<T> &s) : max_size_(s.size()),cur_size_(s.size()),
+    default_value_(s.default_value_.get()),array_(0)
 {
-    try {
-        this->array_ = new T[s.size()]();
-    } catch (std::bad_alloc) {
-        throw std::bad_alloc();
-    }
-    std::copy(s.array_, s.array_ + s.size(), this-> array_);
-    this->max_size_ = s.size();
-    this->cur_size_ = s.size();
+    scoped_array<T> tmp (new T[s.size()]);
+    std::copy(s.array_.get(),s.array_.get() + max_size_, tmp.get());
+    tmp.swap(array_);
 }
 
-// Compare this array with <s> for equality.
-
-bool
-Array::operator== (const Array &s) const
+template <typename T> void
+Array<T>::resize (size_t new_size)
 {
-    if (this->max_size_ == s.size()){
-        for (int i=0; i < s.size(); i++){
-            if (this->array_[i] != s.array_[i])
-                return false;
+    if (new_size < cur_size_){
+        cur_size_ = new_size;
+    } else {
+        if (new_size <= max_size_){
+            if (default_value_.get() != nullptr){
+                std::fill(array_.get() + cur_size_,array_.get() + new_size,*default_value_.get());
+            }
+            cur_size_ = new_size;
+        } else {
+            //reallocate
+            scoped_array<T> tmp(new T[new_size]);
+            std::copy(array_.get(),array_.get() + cur_size_,tmp.get());
+            if (default_value_.get() != nullptr){
+                std::fill(tmp.get() + cur_size_,tmp.get() + new_size,*default_value_.get());
+            }
+            array_.swap(tmp);
+            max_size_ = new_size;
+            cur_size_ = new_size;
         }
-        return true;
     }
-    return false;
 }
 
-// Compare this array with <s> for inequality.
-
-bool
-Array::operator!= (const Array &s) const
+template <typename T> void
+Array<T>::swap (Array<T> &new_array)
 {
-    bool different = false;
-    if (this->max_size_ == s.size()){
-        for (int i=0; i < this->max_size_; i++){
-            if (this->array_[i] != s.array_[i])
-                different = true;
-        }
-        return different;
-    }
-    return true;
+    std::swap(max_size_, new_array.max_size_);
+    std::swap(cur_size_, new_array.cur_size_);
+    std::swap(default_value_, new_array.default_value_);
+    new_array.array_.swap(array_);
 }
 
 // Assignment operator (performs assignment).
 
-Array &
-Array::operator= (const Array &s)
+template <typename T> Array<T> &
+Array<T>::operator= (const Array<T> &s)
 {
-    if (this-> max_size_ < s.size()){
-        delete [] this->array_;
-        try {
-            this->array_ = new T[s.size()]();
-            this->max_size_ = s.size();
-        } catch (std::bad_alloc) {
-            throw std::bad_alloc();
-        }
+    if(*this != s){
+        Array tmp(s);
+        swap(tmp);
     }
-    this->cur_size_ = s.size();
-    
-    std::copy(s.array_, s.array_ + s.size(), this-> array_);
-    
     return *this;
 }
 
 // Clean up the array (e.g., delete dynamically allocated memory).
 
-Array::~Array (void)
+template <typename T>
+Array<T>::~Array (void)
 {
-    delete[] this->array_;
 }
 
 // = Set/get methods.
 
-// Set an item in the array at location index.  Throws
-// <std::out_of_range> if index is out of range, i.e., larger than the
-// size() of the array.
+// Set an item in the array at location index.
 
-void
-Array::set (const T &new_item, size_t index)
+template <typename T> void
+Array<T>::set (const T &new_item, size_t index)
 {
-    if (!this->in_range(index))
-        throw std::out_of_range("Set failed");
-    
-    this->array_[index] = new_item;
-    if (this->cur_size_ < index)
-        this->cur_size_ = index;
+    // Set an item in the array at location index.  If <index> >=
+    // <s.cur_size_> then <resize()> the array so it's big enough.
+    // Throws <std::bad_alloc> if resizing the array fails.
+    if (!in_range(index))
+        resize(index+1);
+    array_[index] = new_item;
 }
 
-// Get an item in the array at location index.  Throws
-// <std::out_of_range> if index is out of range, i.e., larger than the
-// size() of the array.
+// Get an item in the array at location index.
 
-void
-Array::get (T &item, size_t index) const
+template <typename T> void
+Array<T>::get (T &item, size_t index)
 {
-    if (!this->in_range(index))
-        throw std::out_of_range("Get failed");
-    
-   item = this->array_[index];
+    if (!in_range(index))
+        throw std::out_of_range("out of range exception");
+    item = array_[index];
 }
 
-#endif /* ARRAY_C */
+// Compare this array with <s> for equality.
+
+template <typename T> bool
+Array<T>::operator== (const Array<T> &s) const
+{
+    if(cur_size_ !=s.size())
+        return false;
+    else
+        return std::equal(array_.get(),array_.get() + cur_size_,s.array_.get());
+}
+
+// Compare this array with <s> for inequality.
+
+template <typename T> bool
+Array<T>::operator!= (const Array<T> &s) const
+{
+    return !(*this == s);
+}
+
+template <typename T>
+Array_Iterator<T>::Array_Iterator (Array<T> &array, size_t pos) : array_(array),pos_(pos)
+{
+}
+
+template <typename T>
+Const_Array_Iterator<T>::Const_Array_Iterator (const Array<T> &array, size_t pos) : array_(array),pos_(pos)
+{
+}
+
+#endif /* ARRAY_CPP */

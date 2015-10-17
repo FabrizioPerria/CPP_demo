@@ -20,7 +20,7 @@
 #endif /* __INLINE__ */
 
 template <typename T>
-Array<T>::Array (size_t size) : max_size_(size),cur_size_(size),default_value_(nullptr), array_(new T[size])
+Array<T>::Array (size_t size) : array_(new T[size]),max_size_(size),cur_size_(size),default_value_(nullptr)
 {
 }
 
@@ -36,8 +36,8 @@ default_value_(new T(*default_value))
 // The copy constructor (performs initialization).
 
 template <typename T>
-Array<T>::Array (const Array<T> &s) : max_size_(s.size()),cur_size_(s.size()),
-    default_value_(s.default_value_.get()),array_(0)
+Array<T>::Array (const Array<T> &s) : array_(0),max_size_(s.size()),cur_size_(s.size()),
+    default_value_(s.default_value_.get())
 {
     scoped_array<T> tmp (new T[s.size()]);
     std::copy(s.array_.get(),s.array_.get() + max_size_, tmp.get());
